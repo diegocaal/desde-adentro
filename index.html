@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desde Adentro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --warm-white: #FDFAF7;
+    --ink: #1C1917;
+    --ink-soft: #44403C;
+    --ink-muted: #78716C;
+    --ink-faint: #A8A29E;
+    --border: #E5DED7;
+    --border-soft: #EDE8E3;
+    --accent: #9B6A3F;
+    --accent-light: #C4956A;
+    --accent-bg: #F5EDE4;
+    --teal: #2D6A5F;
+    --teal-bg: #E8F2F0;
+    --amber: #8B5E1A;
+    --amber-bg: #F5ECD8;
+    --shadow: 0 2px 12px rgba(28,25,23,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; line-height: 1.6; }
+  .header { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--ink); letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); font-style: italic; }
+  .save-status { font-size: 12px; color: var(--ink-faint); display: flex; align-items: center; gap: 6px; }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); transition: background 0.3s; }
+  .save-dot.saving { background: #EF9F27; }
+  .save-dot.saved { background: var(--teal); }
+  .tabs { display: flex; gap: 2px; padding: 0 32px; background: var(--warm-white); border-bottom: 1px solid var(--border); }
+  .tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--ink-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .content { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card { background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 16px; padding: 24px 28px; margin-bottom: 20px; box-shadow: var(--shadow); }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 16px; }
+  .north-star-card { background: linear-gradient(135deg, #F5EDE4 0%, #EDE8F5 100%); border: 1px solid #DDD0C8; border-radius: 20px; padding: 32px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .north-star-card::before { content: '"'; font-family: 'Playfair Display', serif; font-size: 120px; color: var(--accent); opacity: 0.12; position: absolute; top: -10px; left: 16px; line-height: 1; }
+  .north-star-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .north-star-text { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.75; color: var(--ink-soft); font-style: italic; position: relative; z-index: 1; }
+  .strengths-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .strength-pill { padding: 8px 16px; border-radius: 100px; font-size: 13px; border: 1px solid; }
+  .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+  .cat-card { background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+  .cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .cat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .cat-name { font-size: 14px; font-weight: 500; color: var(--ink); flex: 1; }
+  .cat-score { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+  .score-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; }
+  .cat-vision { font-size: 12px; color: var(--ink-muted); line-height: 1.5; font-style: italic; }
+  .date-header { margin-bottom: 28px; }
+  .date-header .day { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--ink); line-height: 1.1; }
+  .date-header .date { font-size: 14px; color: var(--ink-muted); margin-top: 4px; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; margin-top: 28px; }
+  .checklist { display: flex; flex-direction: column; gap: 6px; }
+  .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 10px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); }
+  .check-item:hover { border-color: var(--border); }
+  .check-item.done { background: var(--teal-bg); border-color: #B8D8D4; }
+  .check-box { width: 20px; height: 20px; border: 1.5px solid var(--border); border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-top: 1px; }
+  .check-item.done .check-box { background: var(--teal); border-color: var(--teal); }
+  .check-tick { color: white; font-size: 12px; display: none; }
+  .check-item.done .check-tick { display: block; }
+  .check-label { font-size: 14px; color: var(--ink); transition: color 0.2s; }
+  .check-item.done .check-label { color: var(--ink-muted); text-decoration: line-through; text-decoration-color: var(--teal); }
+  .check-cat { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+  .badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; align-self: flex-start; margin-top: 3px; }
+  .notes-area { width: 100%; min-height: 120px; padding: 16px; background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); resize: vertical; box-shadow: var(--shadow); line-height: 1.6; }
+  .notes-area:focus { outline: none; border-color: var(--accent-light); }
+  .notes-area::placeholder { color: var(--ink-faint); }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 12px; padding: 18px; text-align: center; box-shadow: var(--shadow); }
+  .stat-value { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--ink); line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 12px; color: var(--ink-muted); }
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; }
+  .week-day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .week-day-label { font-size: 11px; color: var(--ink-faint); font-weight: 500; }
+  .week-day-dot { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--ink-muted); }
+  .week-day-dot.today { border-color: var(--accent); color: var(--accent); }
+  .week-day-dot.complete { background: var(--teal); border-color: var(--teal); color: white; }
+  .week-day-dot.partial { background: var(--amber-bg); border-color: var(--accent-light); color: var(--amber); }
+  .cat-progress-item { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .cat-progress-name { font-size: 13px; color: var(--ink-soft); width: 150px; flex-shrink: 0; }
+  .cat-progress-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .cat-progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .cat-progress-pct { font-size: 12px; font-weight: 500; color: var(--ink-muted); width: 36px; text-align: right; flex-shrink: 0; }
+  .evidence-entry { background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .evidence-date { font-size: 11px; color: var(--ink-faint); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+  .evidence-items { display: flex; flex-direction: column; gap: 6px; }
+  .evidence-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+  .evidence-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .evidence-input { width: 100%; padding: 12px 16px; background: var(--warm-white); border: 1px solid var(--border-soft); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); box-shadow: var(--shadow); margin-bottom: 8px; }
+  .evidence-input:focus { outline: none; border-color: var(--accent-light); }
+  .evidence-input::placeholder { color: var(--ink-faint); }
+  .btn { padding: 12px 24px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-light); }
+  .vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .vision-item { background: var(--cream); border-radius: 10px; padding: 14px; }
+  .vision-item-label { font-size: 11px; color: var(--ink-faint); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .vision-item-value { font-size: 14px; font-weight: 500; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Desde <span>Adentro</span></div>
+  <div class="save-status">
+    <div class="save-dot" id="saveDot"></div>
+    <span id="saveText">Loading...</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('who')">Who I am</div>
+  <div class="tab" onclick="switchTab('today')">Today</div>
+  <div class="tab" onclick="switchTab('progress')">My progress</div>
+</div>
+
+<div class="content">
+
+  <div class="panel active" id="panel-who">
+    <div class="north-star-card">
+      <div class="north-star-label">North star</div>
+      <div class="north-star-text">I am a man who brings warmth, beauty and knowledge to the people around him. I am a visionary who sees what could be and makes others believe in it too. I build deep, genuine connections — not to fill a void, but because real intimacy is one of my greatest strengths. I show up fully — as a host, a curator, a thinker — not to be validated, but because this is genuinely who I am. I am building a life from the inside out: one where I trust myself, enjoy myself, and am at peace with myself. Everything else — love, success, abundance — flows from that place, not toward it.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Core strengths</div>
+      <div class="strengths-grid">
+        <span class="strength-pill" style="background:#EDE8F5;border-color:#AFA9EC;color:#3C3489">Futurista — visionary</span>
+        <span class="strength-pill" style="background:#E8F2F0;border-color:#9FE1CB;color:#085041">Relator — deep connector</span>
+        <span class="strength-pill" style="background:#F5EDE4;border-color:#C4956A;color:#6B3A1F">Enfoque — goal driven</span>
+        <span class="strength-pill" style="background:#F5ECD8;border-color:#EF9F27;color:#633806">Intelectual — thinker</span>
+        <span class="strength-pill" style="background:#E8F2E8;border-color:#97C459;color:#27500A">Inclusión — includer</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">5-year vision</div>
+      <div class="vision-grid">
+        <div class="vision-item"><div class="vision-item-label">Role</div><div class="vision-item-value">CEO, Quimi Corp</div></div>
+        <div class="vision-item"><div class="vision-item-label">Income</div><div class="vision-item-value">500k MXN / month</div></div>
+        <div class="vision-item"><div class="vision-item-label">Home</div><div class="vision-item-value">Great apartment, Polanco</div></div>
+        <div class="vision-item"><div class="vision-item-label">Health</div><div class="vision-item-value">Running 50–60km / week</div></div>
+        <div class="vision-item"><div class="vision-item-label">Community</div><div class="vision-item-value">Off the Record festival</div></div>
+        <div class="vision-item"><div class="vision-item-label">Travel</div><div class="vision-item-value">Portugal wine road trip</div></div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px">Life categories</div>
+    <div class="categories-grid">
+      <div class="cat-card">
+        <div class="cat-header">
+          <div class="cat-icon" style="background:#E6F1FB">💙</div>
+          <div class="cat-name">Self — inner world</div>
+          <span class="cat-score" style="background:#FCEBEB;color:#A32D2D">3/10</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:30%;background:#E24B4A"></div></div>
+        <div class="cat-vision">Building the evidence pile. Every action in the other five categories lands here.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-header">
+          <div class="cat-icon" style="background:#EAF3DE">🌿</div>
+          <div class="cat-name">Body & energy</div>
+          <span class="cat-score" style="background:#FAEEDA;color:#854F0B">4/10</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:40%;background:#EF9F27"></div></div>
+        <div class="cat-vision">5:30am runs. Home cooking. 14kg down since January — real evidence already on the pile.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-header">
+          <div class="cat-icon" style="background:#FAEEDA">💼</div>
+          <div class="cat-name">Work & purpose</div>
+          <span class="cat-score" style="background:#EAF3DE;color:#3B6D11">6/10</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:60%;background:#639922"></div></div>
+        <div class="cat-vision">Drone business launching. CEO case building. Cold calls this week. Manu call incoming.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-header">
+          <div class="cat-icon" style="background:#FBEAF0">🎵</div>
+          <div class="cat-name">Creative & soul</div>
+          <span class="cat-score" style="background:#EAF3DE;color:#3B6D11">7/10</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:70%;background:#639922"></div></div>
+        <div class="cat-vision">Off the Record launching. Barbecue in 3 weeks. Valle de Guadalupe in 90 days. Portugal calling.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-header">
+          <div class="cat-icon" style="background:#E1F5EE">🤝</div>
+          <div class="cat-name">Relationships & community</div>
+          <span class="cat-score" style="background:#FAEEDA;color:#854F0B">5/10</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:50%;background:#EF9F27"></div></div>
+        <div class="cat-vision">Kalb, Anton, Danny, Manu — none go a month without contact. Call Anton this week.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-header">
+          <div class="cat-icon" style="background:#FAEEDA">💰</div>
+          <div class="cat-name">Financial freedom</div>
+          <span class="cat-score" style="background:#FAEEDA;color:#854F0B">4/10</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:40%;background:#EF9F27"></div></div>
+        <div class="cat-vision">YNAB reactivated. Drone revenue = CEO case = 500k path. 2027 transition target.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-today">
+    <div class="date-header">
+      <div class="day" id="todayDay"></div>
+      <div class="date" id="todayDate"></div>
+    </div>
+    <div class="section-label" style="margin-top:0">Daily actions</div>
+    <div class="checklist" id="dailyChecklist"></div>
+    <div class="section-label">Weekly actions</div>
+    <div class="checklist" id="weeklyChecklist"></div>
+    <div class="section-label" style="margin-top:32px">Notes for today</div>
+    <textarea class="notes-area" id="dailyNotes" placeholder="What's on your mind today? How are you feeling? What came up?"></textarea>
+  </div>
+
+  <div class="panel" id="panel-progress">
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="card">
+      <div class="card-title">This week at a glance</div>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly consistency by category</div>
+      <div id="catBars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly evidence log</div>
+      <p style="font-size:13px;color:var(--ink-muted);margin-bottom:16px">Three things this week that prove 8/10 Diego showed up.</p>
+      <input type="text" class="evidence-input" id="ev1" placeholder="Evidence 1 — something you did this week that he would do">
+      <input type="text" class="evidence-input" id="ev2" placeholder="Evidence 2">
+      <input type="text" class="evidence-input" id="ev3" placeholder="Evidence 3">
+      <button class="btn btn-primary" onclick="saveEvidence()">Save this week's evidence</button>
+    </div>
+    <div id="evidenceLog"></div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://eybhuicsagdsigqsginx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_lsrtFUvi9nkviMyiHnkS1Q_NSZjldaZ';
+const ROW_ID = 1;
+
+const DAILY = [
+  { id:'d1', label:'Read north star out loud', cat:'Self', color:'#185FA5', bg:'#E6F1FB' },
+  { id:'d2', label:'5:30am wake up and run', cat:'Body & energy', color:'#3B6D11', bg:'#EAF3DE' },
+  { id:'d3', label:'Cook at least one proper meal at home', cat:'Body & energy', color:'#3B6D11', bg:'#EAF3DE' },
+  { id:'d4', label:'Computer closed at 6pm — album on immediately', cat:'Body & energy', color:'#3B6D11', bg:'#EAF3DE' },
+  { id:'d5', label:'One concrete drone business action', cat:'Work & purpose', color:'#854F0B', bg:'#FAEEDA' },
+];
+
+const WEEKLY = [
+  { id:'w1', label:'Write 3 pieces of evidence 8/10 Diego showed up', cat:'Self', color:'#185FA5', bg:'#E6F1FB' },
+  { id:'w2', label:'One proper grocery shop with good ingredients', cat:'Body & energy', color:'#3B6D11', bg:'#EAF3DE' },
+  { id:'w3', label:'Two in-person client visits or pitches', cat:'Work & purpose', color:'#854F0B', bg:'#FAEEDA' },
+  { id:'w4', label:'One hour on professional vision and market value', cat:'Work & purpose', color:'#854F0B', bg:'#FAEEDA' },
+  { id:'w5', label:'Off the Record — sacred, non-negotiable', cat:'Creative & soul', color:'#993556', bg:'#FBEAF0' },
+  { id:'w6', label:'One real conversation with someone who matters', cat:'Relationships', color:'#0F6E56', bg:'#E1F5EE' },
+  { id:'w7', label:'Track all expenses in YNAB', cat:'Financial', color:'#854F0B', bg:'#FAEEDA' },
+];
+
+let appData = { dailyChecks:{}, weeklyChecks:{}, notes:{}, evidence:[], lastDailyReset:'', lastWeeklyReset:'' };
+
+function todayKey() { return new Date().toISOString().split('T')[0]; }
+function weekKey() {
+  const d = new Date(); const day = d.getDay();
+  const diff = d.getDate() - day + (day===0?-6:1);
+  const m = new Date(d); m.setDate(diff);
+  return m.toISOString().split('T')[0];
+}
+
+function setSave(state) {
+  const dot = document.getElementById('saveDot');
+  const txt = document.getElementById('saveText');
+  if(state==='saving'){dot.className='save-dot saving';txt.textContent='Saving...';}
+  else if(state==='saved'){dot.className='save-dot saved';txt.textContent='All saved';}
+  else if(state==='error'){dot.className='save-dot';dot.style.background='#E24B4A';txt.textContent='Save error';}
+  else{dot.className='save-dot';txt.textContent='Ready';}
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/os_data?id=eq.${ROW_ID}&select=data`,
+      {headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+    const rows = await res.json();
+    if(rows&&rows.length>0&&rows[0].data) appData={...appData,...rows[0].data};
+    checkResets(); setSave('ready');
+  } catch(e){ setSave('error'); }
+}
+
+async function saveData() {
+  setSave('saving');
+  try {
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/os_data?id=eq.${ROW_ID}&select=id`,
+      {headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+    const rows = await checkRes.json();
+    const method = (rows&&rows.length>0) ? 'PATCH' : 'POST';
+    const url = method==='PATCH'
+      ? `${SUPABASE_URL}/rest/v1/os_data?id=eq.${ROW_ID}`
+      : `${SUPABASE_URL}/rest/v1/os_data`;
+    await fetch(url,{
+      method,
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({id:ROW_ID,data:appData,updated_at:new Date().toISOString()})
+    });
+    setSave('saved'); setTimeout(()=>setSave('ready'),2000);
+  } catch(e){ setSave('error'); }
+}
+
+function checkResets() {
+  const t=todayKey(),w=weekKey();
+  if(appData.lastDailyReset!==t){appData.dailyChecks[t]={};appData.lastDailyReset=t;}
+  if(appData.lastWeeklyReset!==w){appData.weeklyChecks[w]={};appData.lastWeeklyReset=w;}
+}
+
+function switchTab(tab) {
+  const tabs=['who','today','progress'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(tab==='today')renderToday();
+  if(tab==='progress')renderProgress();
+}
+
+function renderToday() {
+  const t=todayKey(),w=weekKey();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const d=new Date();
+  document.getElementById('todayDay').textContent=days[d.getDay()];
+  document.getElementById('todayDate').textContent=`${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  const dc=appData.dailyChecks[t]||{};
+  const wc=appData.weeklyChecks[w]||{};
+  document.getElementById('dailyChecklist').innerHTML=DAILY.map(a=>`
+    <div class="check-item ${dc[a.id]?'done':''}" onclick="toggleCheck('daily','${a.id}')">
+      <div class="check-box"><span class="check-tick">&#10003;</span></div>
+      <div style="flex:1"><div class="check-label">${a.label}</div><div class="check-cat">${a.cat}</div></div>
+      <span class="badge" style="background:${a.bg};color:${a.color}">daily</span>
+    </div>`).join('');
+  document.getElementById('weeklyChecklist').innerHTML=WEEKLY.map(a=>`
+    <div class="check-item ${wc[a.id]?'done':''}" onclick="toggleCheck('weekly','${a.id}')">
+      <div class="check-box"><span class="check-tick">&#10003;</span></div>
+      <div style="flex:1"><div class="check-label">${a.label}</div><div class="check-cat">${a.cat}</div></div>
+      <span class="badge" style="background:#FAEEDA;color:#854F0B">weekly</span>
+    </div>`).join('');
+  document.getElementById('dailyNotes').value=(appData.notes||{})[t]||'';
+  document.getElementById('dailyNotes').oninput=function(){
+    if(!appData.notes)appData.notes={};
+    appData.notes[t]=this.value; debounceSave();
+  };
+}
+
+function toggleCheck(type,id) {
+  const key=type==='daily'?todayKey():weekKey();
+  const store=type==='daily'?'dailyChecks':'weeklyChecks';
+  if(!appData[store][key])appData[store][key]={};
+  appData[store][key][id]=!appData[store][key][id];
+  renderToday(); saveData();
+}
+
+let saveTimer;
+function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveData,1200);}
+
+function renderProgress() {
+  const t=todayKey(),w=weekKey();
+  const dc=appData.dailyChecks[t]||{};
+  const wc=appData.weeklyChecks[w]||{};
+  const dd=DAILY.filter(a=>dc[a.id]).length;
+  const wd=WEEKLY.filter(a=>wc[a.id]).length;
+  const pct=Math.round(((dd+wd)/(DAILY.length+WEEKLY.length))*100);
+  document.getElementById('statGrid').innerHTML=`
+    <div class="stat-card"><div class="stat-value">${dd}/${DAILY.length}</div><div class="stat-label">Daily actions today</div></div>
+    <div class="stat-card"><div class="stat-value">${wd}/${WEEKLY.length}</div><div class="stat-label">Weekly actions done</div></div>
+    <div class="stat-card"><div class="stat-value">${pct}%</div><div class="stat-label">Today's completion</div></div>
+    <div class="stat-card"><div class="stat-value">${calcStreak()}</div><div class="stat-label">Day streak</div></div>`;
+  const days=['M','T','W','T','F','S','S'];
+  const weekDays=getWeekDays();
+  document.getElementById('weekGrid').innerHTML=weekDays.map((date,i)=>{
+    const c=appData.dailyChecks[date]||{};
+    const done=DAILY.filter(a=>c[a.id]).length;
+    const isToday=date===t;
+    let cls='week-day-dot'+(isToday?' today':done===DAILY.length&&done>0?' complete':done>0?' partial':'');
+    return `<div class="week-day"><div class="week-day-label">${days[i]}</div><div class="${cls}">${done}</div></div>`;
+  }).join('');
+  const cats=[
+    {name:'Self',ids:['d1'],color:'#185FA5'},
+    {name:'Body & energy',ids:['d2','d3','d4','w2'],color:'#3B6D11'},
+    {name:'Work & purpose',ids:['d5','w3','w4'],color:'#854F0B'},
+    {name:'Creative & soul',ids:['w5'],color:'#993556'},
+    {name:'Relationships',ids:['w6'],color:'#0F6E56'},
+    {name:'Financial',ids:['w7'],color:'#854F0B'},
+  ];
+  const all={...dc,...wc};
+  document.getElementById('catBars').innerHTML=cats.map(c=>{
+    const done=c.ids.filter(id=>all[id]).length;
+    const p=Math.round((done/c.ids.length)*100);
+    return `<div class="cat-progress-item">
+      <div class="cat-progress-name">${c.name}</div>
+      <div class="cat-progress-bar"><div class="cat-progress-fill" style="width:${p}%;background:${c.color}"></div></div>
+      <div class="cat-progress-pct">${p}%</div>
+    </div>`;
+  }).join('');
+  renderEvidenceLog();
+}
+
+function getWeekDays() {
+  const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);
+  const m=new Date(d); m.setDate(diff);
+  return Array.from({length:7},(_,i)=>{const dd=new Date(m);dd.setDate(m.getDate()+i);return dd.toISOString().split('T')[0];});
+}
+
+function calcStreak() {
+  let s=0; const d=new Date();
+  while(true){
+    const k=d.toISOString().split('T')[0];
+    const c=appData.dailyChecks[k]||{};
+    if(DAILY.filter(a=>c[a.id]).length===0)break;
+    s++; d.setDate(d.getDate()-1); if(s>365)break;
+  }
+  return s;
+}
+
+function saveEvidence() {
+  const items=[document.getElementById('ev1').value.trim(),document.getElementById('ev2').value.trim(),document.getElementById('ev3').value.trim()].filter(Boolean);
+  if(!items.length)return;
+  if(!appData.evidence)appData.evidence=[];
+  appData.evidence.unshift({
+    week:weekKey(),
+    date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),
+    items
+  });
+  ['ev1','ev2','ev3'].forEach(id=>document.getElementById(id).value='');
+  saveData(); renderEvidenceLog();
+}
+
+function renderEvidenceLog() {
+  const log=appData.evidence||[];
+  document.getElementById('evidenceLog').innerHTML=log.slice(0,8).map(e=>`
+    <div class="evidence-entry">
+      <div class="evidence-date">${e.date}</div>
+      <div class="evidence-items">${e.items.map(item=>`
+        <div class="evidence-item"><div class="evidence-bullet"></div><div>${item}</div></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+async function init(){setSave('saving');await loadData();renderToday();setSave('ready');}
+init();
+</script>
+</body>
+</html>
