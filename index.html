@@ -337,7 +337,7 @@ async function loadData(){
 async function saveData(){
   setSave('saving');
   try{
-    const payload={id:ROW_ID,data:appData,updated_at:new Date().toISOString()};
+    const payload={id:ROW_ID,data:appData};
     const res=await fetch(`${SUPABASE_URL}/rest/v1/os_data`,{
       method:'POST',
       headers:{
